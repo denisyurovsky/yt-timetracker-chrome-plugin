@@ -26,10 +26,13 @@ html.dev-preview {
     position: relative;
   }
 
-  // Полноэкранная модалка Element Plus по умолчанию position: fixed и в браузере
-  // растягивается на весь вьюпорт. Её оверлей рендерится внутри #app (телепорт
-  // диалога выключен), поэтому absolute удерживает его строго в пределах рамки.
-  .el-overlay {
+  // Полноэкранная модалка Element Plus по умолчанию раскладывается двумя слоями с
+  // position: fixed — .el-overlay (подложка) и вложенный .el-overlay-dialog
+  // (обёртка диалога). В браузере оба растягиваются на весь вьюпорт. Оба слоя
+  // рендерятся внутри #app (телепорт диалога выключен), поэтому absolute удерживает
+  // их строго в пределах рамки: .el-overlay ← #app, .el-overlay-dialog ← .el-overlay.
+  .el-overlay,
+  .el-overlay-dialog {
     position: absolute;
   }
 }
