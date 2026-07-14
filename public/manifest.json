@@ -13,7 +13,10 @@
     "default_title": "Open YT TimeTracker"
   },
   "permissions": ["storage"],
-  "host_permissions": ["https://youtrack-mapps.sovcombank.ru/*"],
+  "host_permissions": [
+    "https://youtrack-mapps.sovcombank.ru/*",
+    "http://localhost/*"
+  ],
   "background": {
     "service_worker": "service-worker.js",
     "type": "module"
