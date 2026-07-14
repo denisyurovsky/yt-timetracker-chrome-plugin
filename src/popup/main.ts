@@ -20,6 +20,8 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 app.use(createPinia());
 app.use(router);
-app.use(ElementPlus);
+// size: "large" — глобально увеличивает компоненты Element Plus (кнопки, инпуты,
+// селекты и т.п.) до 40px. Отдельные компоненты с явным size это не затрагивает.
+app.use(ElementPlus, { size: "large" });
 
 app.mount("#app");

@@ -59,9 +59,10 @@ const issueUrl = computed(() => {
 .task-modal-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   color: #fff;
+  font-size: 15px;
 
   &__total {
     white-space: nowrap;
@@ -84,7 +85,7 @@ const issueUrl = computed(() => {
   }
 
   &__summary {
-    max-width: 180px;
+    max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -100,6 +101,10 @@ const issueUrl = computed(() => {
     background: none;
     color: #fff;
     cursor: pointer;
+
+    .el-icon {
+      font-size: 24px;
+    }
   }
 }
 </style>

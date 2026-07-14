@@ -200,7 +200,13 @@ async function save() {
   &__presets {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
+
+    // Пресеты остаются компактными чипами (size="small"), но чуть крупнее,
+    // чтобы не выбиваться из увеличенного интерфейса.
+    :deep(.el-button) {
+      --el-button-size: 30px;
+    }
 
     :deep(.el-button + .el-button) {
       margin-left: 0;

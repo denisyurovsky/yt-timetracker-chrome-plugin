@@ -17,23 +17,28 @@ body,
 body {
   width: 600px;
   height: 600px;
-  border-radius: 6px;
+  // Крупное скругление окна. html/body прозрачны, поэтому в установленном
+  // расширении углы попапа скругляются (насколько это позволяет текущий Chrome —
+  // рамку окна в конечном счёте рисует сам браузер).
+  border-radius: 14px;
+  background-color: transparent;
   font-family: "Rubik", sans-serif;
   overflow: hidden;
 }
 
 #app {
-  padding: 4px;
+  // Увеличенные внутренние отступы корневого контейнера.
+  padding: 8px;
   background-color: #fafafa;
   height: 100%;
 }
 
 /* Уведомления — снизу по центру экрана, закрытие по клику */
 .el-notification {
-  width: 330px;
+  width: 360px;
   left: 50% !important;
   right: auto !important;
-  margin-left: -165px;
+  margin-left: -180px;
   cursor: pointer;
 }
 
@@ -41,16 +46,16 @@ body {
 .track-modal.el-dialog.is-fullscreen,
 .worklog-modal.el-dialog.is-fullscreen {
   // Element объявляет 16px прямо на .el-dialog — переопределяем на самом элементе.
-  --el-dialog-padding-primary: 4px;
-  border-radius: 6px;
+  --el-dialog-padding-primary: 8px;
+  border-radius: 14px;
   overflow: hidden;
 }
 
 .track-modal .el-dialog__header,
 .worklog-modal .el-dialog__header {
   margin: 0;
-  height: 32px;
-  padding: 6px;
-  border-radius: 6px 6px 0 0;
+  height: 46px;
+  padding: 8px 10px;
+  border-radius: 14px 14px 0 0;
   background-color: var(--color-primary);
 }

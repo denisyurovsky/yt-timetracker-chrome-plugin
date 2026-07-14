@@ -27,28 +27,36 @@ const route = useRoute();
 
 <style lang="scss" scoped>
 .app-header {
-  padding: 6px;
+  padding: 8px 12px;
   background-color: #5720c9;
-  border-radius: 4px 4px 0 0;
+  border-radius: 12px 12px 0 0;
   display: flex;
-  height: 32px;
+  height: 46px;
   align-items: center;
   justify-content: space-between;
 
+  // Иконка настроек крупнее вместе с шапкой.
+  :deep(.el-icon) {
+    font-size: 22px;
+  }
+
   &__main {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
     flex: 1;
     justify-content: center;
   }
 
   &__logo {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
   }
 
   &__text {
     color: white;
+    font-size: 16px;
+    font-weight: 500;
   }
 }
 </style>
