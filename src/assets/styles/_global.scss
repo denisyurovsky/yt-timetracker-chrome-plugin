@@ -58,4 +58,7 @@ body {
   padding: 8px 10px;
   border-radius: 14px 14px 0 0;
   background-color: var(--color-primary);
+  // Центрируем содержимое шапки (TaskModalHeader) по вертикали.
+  display: flex;
+  align-items: center;
 }

@@ -15,6 +15,7 @@
   "permissions": ["storage"],
   "host_permissions": [
     "https://youtrack-mapps.sovcombank.ru/*",
+    "https://youtrack-test.sovcombank.ru/*",
     "http://localhost/*"
   ],
   "background": {

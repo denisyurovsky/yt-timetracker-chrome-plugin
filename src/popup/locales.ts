@@ -17,6 +17,9 @@ export const LOCALES = {
   ADD: "Добавить",
   DELETE: "Удалить",
   DELETE_TOKEN: "Удалить токен",
+  DELETE_TOKEN_CONFIRM: "Вы уверены?",
+  CONFIRM_YES: "Да",
+  CONFIRM_NO: "Нет",
   TOKEN_DELETED: "Токен удалён",
   SETTINGS_SAVED: "Настройки сохранены",
   TASK_NOT_FOUND: "Задача не найдена",
@@ -31,4 +34,6 @@ export const LOCALES = {
   WORKITEM_DELETED: "Списание удалено",
   NO_WORKITEMS: "Нет ваших списаний по задаче",
   SPENT_TIME: "Время списания",
+  HISTORY: "История списаний",
+  NO_HISTORY: "Нет списаний",
 };

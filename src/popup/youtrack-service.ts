@@ -88,6 +88,10 @@ export default class YTService {
     return request<YTTimeTracking>("getTimeTracking", { issueId, from, to });
   }
 
+  static getAllWorkItems(author = "me", top = 200) {
+    return request<YTWorkItem[]>("getAllWorkItems", { author, top });
+  }
+
   static addWorkItem(
     issueId: string,
     minutes: number,

@@ -14,6 +14,7 @@ export type YtRequestMethod =
   | "getTasks"
   | "getIssueById"
   | "getTimeTracking"
+  | "getAllWorkItems"
   | "addWorkItem"
   | "deleteWorkItem";
 
@@ -33,6 +34,13 @@ export interface GetTimeTrackingParams {
   issueId: string;
   from: number;
   to: number;
+}
+
+export interface GetAllWorkItemsParams {
+  /** Автор списаний: id/login/ringId или "me" для текущего пользователя. */
+  author?: string;
+  /** Максимальное число возвращаемых записей ($top). */
+  top?: number;
 }
 
 export interface AddWorkItemParams {

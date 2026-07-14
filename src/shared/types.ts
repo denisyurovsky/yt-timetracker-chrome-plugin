@@ -36,6 +36,8 @@ export interface YTWorkItem {
   type: YTWorkItemRef | null;
   author?: { id: string };
   text?: string | null;
+  /** Задача списания — приходит только из глобального /api/workItems. */
+  issue?: { id: string; idReadable: string; summary: string };
   $type?: string;
 }
 

@@ -57,23 +57,25 @@ const issueUrl = computed(() => {
 
 <style scoped lang="scss">
 .task-modal-header {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   width: 100%;
+  // Симметричные отступы под кнопку закрытия — центрируемый текст не наезжает на неё.
+  padding: 0 30px;
   color: #fff;
   font-size: 15px;
 
   &__total {
     white-space: nowrap;
     font-weight: 600;
-    // Время — слева, всё остальное прижато вправо.
-    margin-right: auto;
   }
 
   &__task {
     display: flex;
-    align-items: flex-end;
+    align-items: baseline;
     gap: 8px;
     min-width: 0;
   }
@@ -82,6 +84,12 @@ const issueUrl = computed(() => {
     --el-link-text-color: #fff;
     --el-link-hover-text-color: #fff;
     font-weight: 500;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
   }
 
   &__summary {
@@ -93,6 +101,10 @@ const issueUrl = computed(() => {
   }
 
   &__close {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -101,6 +113,11 @@ const issueUrl = computed(() => {
     background: none;
     color: #fff;
     cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
 
     .el-icon {
       font-size: 24px;

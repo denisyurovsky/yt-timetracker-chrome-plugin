@@ -17,6 +17,7 @@ import type {
   GetTasksParams,
   GetIssueByIdParams,
   GetTimeTrackingParams,
+  GetAllWorkItemsParams,
   AddWorkItemParams,
   DeleteWorkItemParams,
 } from "@/shared/messages";
@@ -122,6 +123,24 @@ async function getTimeTracking(
   }
 }
 
+async function getAllWorkItems(
+  author = "me",
+  top = 200,
+): Promise<Either<KyError, YTWorkItem[]>> {
+  try {
+    const ky = await getKyInstance();
+    const res = await ky
+      .get<YTWorkItem[]>(
+        `/api/workItems?fields=id,duration(minutes),date,type(id,name),author(id),text,issue(id,idReadable,summary)&author=${encodeURIComponent(author)}&$top=${top}`,
+      )
+      .json();
+
+    return right(res);
+  } catch (error) {
+    return left(mapError(error, "Не удалось получить историю списаний"));
+  }
+}
+
 async function addWorkItem(
   issueId: string,
   minutes: number,
@@ -192,6 +211,10 @@ export async function callYtApi(
     case "getTimeTracking": {
       const p = params as unknown as GetTimeTrackingParams;
       return serializeEither(await getTimeTracking(p.issueId, p.from, p.to));
+    }
+    case "getAllWorkItems": {
+      const p = (params ?? {}) as unknown as GetAllWorkItemsParams;
+      return serializeEither(await getAllWorkItems(p.author, p.top));
     }
     case "addWorkItem": {
       const p = params as unknown as AddWorkItemParams;

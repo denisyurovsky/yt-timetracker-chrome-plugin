@@ -5,11 +5,12 @@ import YTService from "@/popup/youtrack-service";
 import { useRouter } from "vue-router";
 import { RouteNames } from "@/popup/router";
 import { LOCALES } from "@/popup/locales";
+import { YT_INSTANCES } from "@/popup/instances";
 
 const router = useRouter();
 
 const ytToken = ref("");
-const ytUrl = ref("http://localhost:55000");
+const ytUrl = ref<string>(YT_INSTANCES[0]);
 
 async function proceed() {
   if (!import.meta.env.DEV) {
@@ -39,13 +40,18 @@ const isProceedDisabled = computed(
 <template>
   <div class="login-page">
     <div class="login-page__inputs">
-      <el-input
-        clearable
+      <el-select
         class="my-m"
         placeholder="URL YouTrack"
         v-model="ytUrl"
       >
-      </el-input>
+        <el-option
+          v-for="instance in YT_INSTANCES"
+          :key="instance"
+          :label="instance"
+          :value="instance"
+        />
+      </el-select>
       <el-input
         type="password"
         class="my-s"

@@ -8,6 +8,7 @@ import {
 } from "@/shared/types";
 import debounce from "lodash/debounce";
 import { notify } from "@/popup/notify";
+import { ElMessageBox } from "element-plus";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { RouteNames } from "@/popup/router";
@@ -173,6 +174,17 @@ async function save() {
 }
 
 async function deleteToken() {
+  try {
+    await ElMessageBox.confirm(LOCALES.DELETE_TOKEN_CONFIRM, LOCALES.DELETE_TOKEN, {
+      confirmButtonText: LOCALES.CONFIRM_YES,
+      cancelButtonText: LOCALES.CONFIRM_NO,
+      type: "warning",
+    });
+  } catch {
+    // Отмена подтверждения — ничего не делаем.
+    return;
+  }
+
   await YTService.deleteToken();
 
   notify({

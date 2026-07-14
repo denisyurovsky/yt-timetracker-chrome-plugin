@@ -225,7 +225,11 @@ onMounted(async () => {
     justify-content: space-between;
     gap: 8px;
     padding: 4px 0;
-    border-bottom: 1px solid;
+    border-bottom: 1px solid #d5d5d5;
+
+    &:last-child {
+      border-bottom: none;
+    }
   }
 
   &__info {
