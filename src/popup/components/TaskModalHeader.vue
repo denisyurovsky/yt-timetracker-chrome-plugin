@@ -6,9 +6,7 @@ import { computed } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Всё затреканное время по задаче, в минутах. */
   totalMinutes: number;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
 }>();
 

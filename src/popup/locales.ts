@@ -1,4 +1,3 @@
-/** UI-тексты popup. */
 export const LOCALES = {
   DEFAULT_ERROR: "Ошибка",
   HOW_TO_RETRIEVE_TOKEN:

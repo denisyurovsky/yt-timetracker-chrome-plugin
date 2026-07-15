@@ -13,7 +13,6 @@ const showBack = computed(
     route.name === RouteNames.Settings || route.name === RouteNames.History,
 );
 
-// Кнопки навигации на главном экране: настройки и история.
 const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
 </script>
 
@@ -68,7 +67,6 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
   align-items: center;
   justify-content: space-between;
 
-  // Иконки навигации крупнее вместе с шапкой.
   :deep(.el-icon) {
     font-size: 22px;
   }

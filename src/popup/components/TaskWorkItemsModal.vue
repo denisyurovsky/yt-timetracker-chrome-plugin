@@ -10,9 +10,7 @@ import { computed, ref } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
-  /** ID текущего пользователя — по нему фильтруем списания. */
   userId: string;
 }>();
 
@@ -26,7 +24,6 @@ const workItems = ref<YTWorkItem[]>([]);
 const isLoading = ref(false);
 const deletingId = ref<string | null>(null);
 
-// Только моё суммарное время по задаче (сумма отображаемых списаний).
 const myTotalMinutes = computed(() =>
   workItems.value.reduce(
     (acc, item) => acc + (item.duration?.minutes ?? 0),
@@ -51,7 +48,6 @@ async function onOpen() {
     return;
   }
 
-  // Только списания текущего пользователя, новые сверху.
   workItems.value = res.value.workItems
     .filter((item) => item.author?.id === props.userId)
     .sort((a, b) => b.date - a.date);
@@ -146,7 +142,6 @@ async function remove(item: YTWorkItem) {
     padding: 4px 2px;
     overflow-y: auto;
 
-    // Пустое состояние центрируется в теле модалки.
     :deep(.el-empty) {
       margin: auto;
     }
@@ -231,7 +226,6 @@ async function remove(item: YTWorkItem) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  // Светлый фон под белыми карточками — как на экранах списков.
   background-color: #fafafa;
 }
 </style>

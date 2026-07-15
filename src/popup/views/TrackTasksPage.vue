@@ -14,7 +14,6 @@ import { RouteNames } from "@/popup/router";
 
 interface TrackRow {
   task: YTRegularTask;
-  /** Всё списанное на задачу время (все люди, все типы), в минутах. */
   minutes: number;
   loading: boolean;
 }
@@ -25,16 +24,13 @@ const regularRows = ref<TrackRow[]>([]);
 const dailyRows = ref<TrackRow[]>([]);
 const baseUrl = ref("");
 
-// Настройки, нужные модалке списания.
 const projectId = ref("");
 const defaultTypeId = ref("");
 const step = ref(DEFAULT_STEP);
 
-// Модалка списания.
 const isModalOpen = ref(false);
 const activeRow = ref<TrackRow | null>(null);
 
-// Модалка со списаниями пользователя по задаче.
 const isWorklogOpen = ref(false);
 const userId = ref("");
 
@@ -84,7 +80,6 @@ function openTimeModal(row: TrackRow) {
   isModalOpen.value = true;
 }
 
-// Обновляем суммарное время по задаче после изменения списаний.
 function reloadActiveRow() {
   if (activeRow.value) {
     loadMinutes(activeRow.value);
@@ -216,7 +211,6 @@ onMounted(async () => {
   padding: 4px 2px 12px;
   overflow-y: auto;
 
-  // Пустое состояние центрируется по вертикали в списке.
   :deep(.el-empty) {
     margin: auto;
   }

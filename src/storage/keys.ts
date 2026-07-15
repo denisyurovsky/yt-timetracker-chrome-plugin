@@ -1,4 +1,3 @@
-/** Ключи в chrome.storage. */
 export const KEYS = {
   YTTOKEN: "ytToken",
   YTURL: "ytUrl",

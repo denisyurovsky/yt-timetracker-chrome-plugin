@@ -3,10 +3,6 @@ const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 8;
 const MINUTES_PER_DAY = MINUTES_PER_HOUR * HOURS_PER_DAY;
 
-/**
- * Форматирует минуты в строку вида `XДYЧZZМ`. Нулевые единицы опускаются:
- * 80 → `1Ч20М`, 480 → `1Д`, 20 → `20М`, 0 → `0М`.
- */
 export function formatMinutes(totalMinutes: number): string {
   const total = Math.max(0, Math.round(totalMinutes));
 
@@ -22,7 +18,6 @@ export function formatMinutes(totalMinutes: number): string {
   return parts.length ? parts.join("") : "0М";
 }
 
-/** Форматирует минуты в строку 'XчYм' (часы+минуты, без дней): 90 → '1ч30м', 45 → '45м', 0 → '0м'. */
 export function formatDuration(totalMinutes: number): string {
   const total = Math.max(0, Math.round(totalMinutes));
   const hours = Math.floor(total / 60);
@@ -35,7 +30,6 @@ export function formatDuration(totalMinutes: number): string {
   return parts.length ? parts.join("") : "0м";
 }
 
-/** Парсит строку длительности ('1ч30м', '30м', '90') в минуты. */
 export function parseDuration(text: string): number {
   if (!text) return 0;
 
@@ -49,12 +43,10 @@ export function parseDuration(text: string): number {
     return hours * 60 + minutes;
   }
 
-  // Просто число — трактуем как минуты.
   const bare = Number(normalized);
   return Number.isFinite(bare) ? Math.max(0, Math.round(bare)) : 0;
 }
 
-/** Форматирует метку времени (мс) в дату вида ДД.ММ.ГГГГ. */
 export function formatDate(ms: number): string {
   const date = new Date(ms);
   const dd = String(date.getDate()).padStart(2, "0");

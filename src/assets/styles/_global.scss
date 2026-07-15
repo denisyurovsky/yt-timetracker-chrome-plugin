@@ -27,13 +27,11 @@ body {
 }
 
 #app {
-  // Увеличенные внутренние отступы корневого контейнера.
   padding: 8px;
   background-color: #fafafa;
   height: 100%;
 }
 
-/* Уведомления — снизу по центру экрана, закрытие по клику */
 .el-notification {
   width: 360px;
   left: 50% !important;
@@ -42,7 +40,6 @@ body {
   cursor: pointer;
 }
 
-/* Шапка модалок — как у основного приложения: фиолетовая, скруглённая */
 .track-modal.el-dialog.is-fullscreen,
 .worklog-modal.el-dialog.is-fullscreen {
   // Element объявляет 16px прямо на .el-dialog — переопределяем на самом элементе.
@@ -58,7 +55,6 @@ body {
   padding: 8px 10px;
   border-radius: 14px 14px 0 0;
   background-color: var(--color-primary);
-  // Центрируем содержимое шапки (TaskModalHeader) по вертикали.
   display: flex;
   align-items: center;
 }

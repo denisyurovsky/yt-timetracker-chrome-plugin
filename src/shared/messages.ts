@@ -59,7 +59,6 @@ export interface DeleteWorkItemParams {
 export interface YtApiMessage {
   kind: "yt-api";
   method: YtRequestMethod;
-  /** Параметры метода (projectId, issueId, тело списания и т.д.). */
   params?: Record<string, unknown>;
 }
 

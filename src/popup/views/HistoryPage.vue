@@ -13,7 +13,6 @@ const isLoading = ref(false);
 const deletingId = ref<string | null>(null);
 const baseUrl = ref("");
 
-// Списания сгруппированы по дате (новые сверху), внутри группы — тоже новые сверху.
 const groups = computed(() => {
   const byDate = new Map<string, YTWorkItem[]>();
   for (const item of workItems.value) {
@@ -139,7 +138,6 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 4px 2px 12px;
 
-  // Пустое состояние по центру списка.
   :deep(.el-empty) {
     margin-top: 20%;
   }

@@ -9,15 +9,10 @@ import { computed, ref } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Всё затреканное время по задаче (для шапки), в минутах. */
   totalMinutes: number;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
-  /** Проект, чьи типы работ подтягиваем в дропдаун. */
   projectId: string;
-  /** Тип списания по умолчанию (из настроек). */
   defaultTypeId: string;
-  /** Длительность одного списания в минутах (шаг из настроек). */
   step: number;
 }>();
 
@@ -34,7 +29,6 @@ const comment = ref("");
 const isTypesLoading = ref(false);
 const isSaving = ref(false);
 
-// Пресеты времени списания: 15/30/45/60 + шаг из настроек (без дублей).
 const presets = computed(() => {
   const values = new Set<number>([props.step, 15, 30, 45, 60, 120, 180, 240, 360, 480]);
   return [...values].sort((a, b) => a - b);
@@ -202,8 +196,6 @@ async function save() {
     flex-wrap: wrap;
     gap: 6px;
 
-    // Пресеты остаются компактными чипами (size="small"), но чуть крупнее,
-    // чтобы не выбиваться из увеличенного интерфейса.
     :deep(.el-button) {
       --el-button-size: 30px;
     }
@@ -213,7 +205,6 @@ async function save() {
     }
   }
 
-  // Тело — на всю высоту диалога; комментарий растягивается на остаток.
   &__body {
     display: flex;
     flex-direction: column;
