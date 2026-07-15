@@ -137,34 +137,75 @@ onMounted(async () => {
 .history-page {
   height: 100%;
   overflow-y: auto;
-  padding-top: 6px;
+  padding: 4px 2px 12px;
+
+  // Пустое состояние по центру списка.
+  :deep(.el-empty) {
+    margin-top: 20%;
+  }
+
+  &__group + &__group {
+    margin-top: 16px;
+  }
 
   &__date {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-bottom: 8px;
+    padding: 4px 2px;
+    font-size: 12px;
     font-weight: 600;
-    margin: 8px 0 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--el-text-color-secondary);
+    // Совпадает с фоном приложения, чтобы карточки уходили под заголовок при скролле.
+    background-color: #fafafa;
   }
 
   &__row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--el-border-color-lighter);
+    gap: 10px;
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: var(--el-border-radius-base);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    & + & {
+      margin-top: 8px;
+    }
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 2px 10px rgba(87, 32, 201, 0.1);
+    }
   }
 
   &__info {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    gap: 8px;
     flex: 1;
     min-width: 0;
   }
 
   &__id {
     flex-shrink: 0;
-    font-weight: 500;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--el-border-radius-small);
+    background-color: var(--el-color-primary-light-9);
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--el-color-primary-light-8);
+    }
   }
 
   &__summary {
@@ -172,12 +213,22 @@ onMounted(async () => {
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 100%;
+    color: var(--el-text-color-regular);
+  }
+
+  &__type {
+    flex-shrink: 0;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-secondary);
   }
 
   &__comment {
+    flex-basis: 100%;
     white-space: normal;
     word-break: break-word;
-    flex-basis: 100%;
+    color: var(--el-text-color-secondary);
   }
 
   &__right {
@@ -189,6 +240,8 @@ onMounted(async () => {
 
   &__time {
     white-space: nowrap;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
   }
 }
 </style>

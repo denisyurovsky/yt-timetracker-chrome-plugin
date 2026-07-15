@@ -140,31 +140,69 @@ async function remove(item: YTWorkItem) {
 .worklog-modal {
   &__body {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 2px;
     overflow-y: auto;
+
+    // Пустое состояние центрируется в теле модалки.
+    :deep(.el-empty) {
+      margin: auto;
+    }
   }
 
   &__row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--el-border-color-lighter);
+    gap: 10px;
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: var(--el-border-radius-base);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 2px 10px rgba(87, 32, 201, 0.1);
+    }
   }
 
   &__info {
     display: flex;
-    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   &__date {
-    font-weight: 500;
+    flex-shrink: 0;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--el-border-radius-small);
+    background-color: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+  }
+
+  &__type {
+    flex-shrink: 0;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-secondary);
   }
 
   &__comment {
-    font-size: 12px;
+    flex-basis: 100%;
+    font-size: 13px;
     white-space: normal;
     word-break: break-word;
+    color: var(--el-text-color-secondary);
   }
 
   &__right {
@@ -176,6 +214,8 @@ async function remove(item: YTWorkItem) {
 
   &__time {
     white-space: nowrap;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
   }
 }
 </style>
@@ -191,5 +231,7 @@ async function remove(item: YTWorkItem) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  // Светлый фон под белыми карточками — как на экранах списков.
+  background-color: #fafafa;
 }
 </style>
