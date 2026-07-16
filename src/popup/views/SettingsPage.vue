@@ -12,8 +12,14 @@ import { ElMessageBox } from "element-plus";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { RouteNames } from "@/popup/router";
-import { DEFAULT_STEP, loadSettings, saveSettings } from "@/storage/settings";
-import { formatDuration, parseDuration } from "@/popup/format";
+import {
+  loadSettings,
+  loadYouTrackUrl,
+  saveSettings,
+  saveYouTrackUrl,
+} from "@/storage/settings";
+import { formatDuration, tryParseDuration } from "@/popup/format";
+import { YT_INSTANCES } from "@/popup/instances";
 
 const popperOptions = {
   modifiers: [
@@ -78,31 +84,53 @@ const dailyOptions = computed(() => {
 });
 
 const stepText = ref("");
+const ytUrl = ref<string>(YT_INSTANCES[0]);
+const isDev = import.meta.env.DEV;
+
+const instanceOptions = computed(() => {
+  const urls = new Set<string>(YT_INSTANCES);
+  if (ytUrl.value) urls.add(ytUrl.value);
+  return [...urls];
+});
 
 function notifyError(message: string) {
   notify({ type: "error", title: LOCALES.DEFAULT_ERROR, message });
 }
 
-async function fetchProjects() {
+async function fetchProjects(): Promise<YTProject[]> {
   const res = await YTService.getProjects();
 
-  res.fold(
-    (error) => notifyError(error.message),
-    (data) => (projects.value = data),
+  return res.fold(
+    (error) => {
+      notifyError(error.message);
+      projects.value = [];
+      return [];
+    },
+    (data) => {
+      projects.value = data;
+      return data;
+    },
   );
 }
 
-async function fetchWorkTypes(projectId: string) {
+async function fetchWorkTypes(projectId: string): Promise<YTWorkItemType[]> {
   if (!projectId) {
     workItemTypes.value = [];
-    return;
+    return [];
   }
 
   const res = await YTService.getProjectsWorkTypes(projectId);
 
-  res.fold(
-    (error) => notifyError(error.message),
-    ({ workItemTypes: items }) => (workItemTypes.value = items),
+  return res.fold(
+    (error) => {
+      notifyError(error.message);
+      workItemTypes.value = [];
+      return [];
+    },
+    ({ workItemTypes: items }) => {
+      workItemTypes.value = items;
+      return items;
+    },
   );
 }
 
@@ -111,37 +139,94 @@ function onProjectChange(projectId: string) {
   fetchWorkTypes(projectId);
 }
 
-const searchTasks = debounce(async (query: string) => {
-  if (query.length < 2) return;
+/**
+ * Первая настройка: если проект/тип работы ещё не сохранены —
+ * берём первые из ответа API и сразу пишем в storage.
+ */
+async function applyDefaultProjectAndWorkType(settings: {
+  projectId: string;
+  workTypeId: string;
+  step: number;
+  regularTasks: YTRegularTask[];
+  dailyTasks: YTRegularTask[];
+}): Promise<void> {
+  let projectId = settings.projectId;
+  let workTypeId = settings.workTypeId;
+  let changed = false;
 
-  isTasksLoading.value = true;
-  const res = await YTService.getTasks(query);
-  isTasksLoading.value = false;
+  const firstProject = projects.value[0];
+  if (!projectId && firstProject) {
+    projectId = firstProject.id;
+    changed = true;
+  }
+
+  selectedProjectId.value = projectId;
+
+  if (projectId) {
+    const types = await fetchWorkTypes(projectId);
+    const firstType = types[0];
+    if (!workTypeId && firstType) {
+      workTypeId = firstType.id;
+      changed = true;
+    }
+  }
+
+  selectedWorkTypeId.value = workTypeId;
+
+  if (!changed) return;
+
+  await saveSettings({
+    ...settings,
+    projectId,
+    workTypeId,
+  });
+}
+
+const TASKS_TOP = 20;
+
+async function loadTasks(
+  query: string,
+  target: "regular" | "daily",
+): Promise<void> {
+  const loading = target === "regular" ? isTasksLoading : isDailyTasksLoading;
+  const results =
+    target === "regular" ? taskSearchResults : dailyTaskSearchResults;
+
+  loading.value = true;
+  const res = await YTService.getTasks(query, TASKS_TOP);
+  loading.value = false;
 
   res.fold(
     (error) => notifyError(error.message),
-    (data) => (taskSearchResults.value = data),
+    (data) => (results.value = data),
   );
+}
+
+const searchTasks = debounce(async (query: string) => {
+  const trimmed = query.trim();
+  if (trimmed.length > 0 && trimmed.length < 2) return;
+  await loadTasks(trimmed, "regular");
 }, 500);
+
+const searchDailyTasks = debounce(async (query: string) => {
+  const trimmed = query.trim();
+  if (trimmed.length > 0 && trimmed.length < 2) return;
+  await loadTasks(trimmed, "daily");
+}, 500);
+
+function onRegularVisibleChange(open: boolean) {
+  if (open) void loadTasks("", "regular");
+}
+
+function onDailyVisibleChange(open: boolean) {
+  if (open) void loadTasks("", "daily");
+}
 
 function onRegularChange(ids: string[]) {
   regularTasks.value = ids
     .map((id) => regularOptions.value.find((task) => task.id === id))
     .filter((task): task is YTRegularTask => Boolean(task));
 }
-
-const searchDailyTasks = debounce(async (query: string) => {
-  if (query.length < 2) return;
-
-  isDailyTasksLoading.value = true;
-  const res = await YTService.getTasks(query);
-  isDailyTasksLoading.value = false;
-
-  res.fold(
-    (error) => notifyError(error.message),
-    (data) => (dailyTaskSearchResults.value = data),
-  );
-}, 500);
 
 function onDailyChange(ids: string[]) {
   dailyTasks.value = ids
@@ -150,11 +235,17 @@ function onDailyChange(ids: string[]) {
 }
 
 async function save() {
+  const parsedStep = tryParseDuration(stepText.value);
+  if (!parsedStep.ok || parsedStep.minutes < 1) {
+    return notifyError(LOCALES.INVALID_DURATION);
+  }
+
   try {
+    await saveYouTrackUrl(ytUrl.value);
     await saveSettings({
       projectId: selectedProjectId.value,
       workTypeId: selectedWorkTypeId.value,
-      step: Math.max(1, parseDuration(stepText.value) || DEFAULT_STEP),
+      step: parsedStep.minutes,
       regularTasks: regularTasks.value,
       dailyTasks: dailyTasks.value,
     });
@@ -197,31 +288,48 @@ async function deleteToken() {
 }
 
 onMounted(async () => {
-  await fetchProjects();
+  const [settings, url] = await Promise.all([
+    loadSettings(),
+    loadYouTrackUrl(),
+    fetchProjects(),
+  ]);
 
-  const settings = await loadSettings();
-  selectedProjectId.value = settings.projectId;
-  selectedWorkTypeId.value = settings.workTypeId;
   stepText.value = formatDuration(settings.step);
   regularTasks.value = settings.regularTasks;
   selectedRegularIds.value = settings.regularTasks.map((task) => task.id);
   dailyTasks.value = settings.dailyTasks;
   selectedDailyIds.value = settings.dailyTasks.map((task) => task.id);
+  ytUrl.value = url || YT_INSTANCES[0];
 
-  if (settings.projectId) {
-    await fetchWorkTypes(settings.projectId);
-  }
+  await applyDefaultProjectAndWorkType(settings);
 });
 </script>
 
 <template>
   <div class="settings-page">
     <div class="settings-page__settings">
+      <el-text tag="div">{{ LOCALES.YT_URL }}</el-text>
+      <el-select
+        v-model="ytUrl"
+        class="my-m"
+        :disabled="isDev"
+        :title="LOCALES.SELECT_YT_URL"
+        :popper-options
+      >
+        <el-option
+          v-for="instance in instanceOptions"
+          :key="instance"
+          :label="instance"
+          :value="instance"
+        />
+      </el-select>
+
       <el-text tag="div">{{ LOCALES.PROJECT }}</el-text>
       <el-select
         v-model="selectedProjectId"
         class="my-m"
         filterable
+        :title="LOCALES.SELECT_PROJECT"
         :popper-options
         @change="onProjectChange"
       >
@@ -238,6 +346,7 @@ onMounted(async () => {
         v-model="selectedWorkTypeId"
         class="my-m"
         :disabled="!selectedProjectId"
+        :title="LOCALES.SELECT_WORK_TYPE"
         :popper-options
       >
         <el-option
@@ -257,8 +366,10 @@ onMounted(async () => {
         :remote-method="searchTasks"
         :loading="isTasksLoading"
         :placeholder="LOCALES.TASK_SEARCH_PLACEHOLDER"
+        :title="LOCALES.SELECT_REGULAR_TASKS"
         class="my-m"
         :popper-options
+        @visible-change="onRegularVisibleChange"
         @change="onRegularChange"
       >
         <el-option
@@ -278,8 +389,10 @@ onMounted(async () => {
         :remote-method="searchDailyTasks"
         :loading="isDailyTasksLoading"
         :placeholder="LOCALES.TASK_SEARCH_PLACEHOLDER"
+        :title="LOCALES.SELECT_DAILY_TASKS"
         class="my-m"
         :popper-options
+        @visible-change="onDailyVisibleChange"
         @change="onDailyChange"
       >
         <el-option
@@ -298,15 +411,23 @@ onMounted(async () => {
           <el-input
             v-model="stepText"
             :placeholder="LOCALES.DURATION_PLACEHOLDER"
+            :title="LOCALES.ENTER_STEP"
             style="width: 110px"
           />
         </div>
       </div>
       <div class="settings-page__actions">
-        <el-button @click="deleteToken" type="danger" plain>
+        <el-button
+          type="danger"
+          plain
+          :title="LOCALES.DELETE_TOKEN"
+          @click="deleteToken"
+        >
           {{ LOCALES.DELETE_TOKEN }}
         </el-button>
-        <el-button @click="save" type="primary">{{ LOCALES.SAVE }}</el-button>
+        <el-button type="primary" :title="LOCALES.SAVE" @click="save">
+          {{ LOCALES.SAVE }}
+        </el-button>
       </div>
     </div>
   </div>

@@ -79,3 +79,14 @@ export async function loadYouTrackUrl(): Promise<string> {
 
   return typeof url === "string" ? url : "";
 }
+
+/** Сохраняет URL инстанса. В DEV URL задаётся через .env и не перезаписывается. */
+export async function saveYouTrackUrl(url: string): Promise<void> {
+  if (import.meta.env.DEV) return;
+
+  await setChromeStorage({
+    storageArea: "sync",
+    key: KEYS.YTURL,
+    value: url,
+  });
+}

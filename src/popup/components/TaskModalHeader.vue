@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatMinutes } from "@/popup/format";
+import { LOCALES } from "@/popup/locales";
 import type { YTRegularTask } from "@/shared/types";
 import { Close } from "@element-plus/icons-vue";
 import { computed } from "vue";
@@ -32,6 +33,7 @@ const issueUrl = computed(() => {
         class="task-modal-header__id"
         underline="never"
         :href="issueUrl"
+        :title="LOCALES.OPEN_TASK_IN_YT"
         target="_blank"
         rel="noopener"
       >
@@ -45,7 +47,8 @@ const issueUrl = computed(() => {
     <button
       class="task-modal-header__close"
       type="button"
-      aria-label="Закрыть"
+      :aria-label="LOCALES.CLOSE"
+      :title="LOCALES.CLOSE"
       @click="emit('close')"
     >
       <el-icon><Close /></el-icon>

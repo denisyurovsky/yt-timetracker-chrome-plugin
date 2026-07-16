@@ -89,6 +89,7 @@ onMounted(async () => {
             type="primary"
             underline="never"
             :href="issueUrl(item.issue?.idReadable ?? '')"
+            :title="LOCALES.OPEN_TASK_IN_YT"
             target="_blank"
             rel="noopener"
           >
@@ -116,7 +117,7 @@ onMounted(async () => {
             link
             type="danger"
             :loading="deletingId === item.id"
-            :title="LOCALES.DELETE"
+            :title="LOCALES.DELETE_WORKITEM"
             @click="remove(item)"
           >
             <el-icon><Delete /></el-icon>

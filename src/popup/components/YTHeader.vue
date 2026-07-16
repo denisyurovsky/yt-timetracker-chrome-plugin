@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import YTLogo from "@/popup/components/YTLogo.vue";
+import { LOCALES } from "@/popup/locales";
 import { RouteNames } from "@/popup/router";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
@@ -23,7 +24,8 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
         v-if="showBack"
         class="app-header__link"
         :to="{ name: RouteNames.TrackTasks }"
-        aria-label="Назад"
+        :title="LOCALES.BACK"
+        :aria-label="LOCALES.BACK"
       >
         <el-icon color="white">
           <ArrowLeft />
@@ -33,7 +35,8 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
         <router-link
           class="app-header__link"
           :to="{ name: RouteNames.Settings }"
-          aria-label="Настройки"
+          :title="LOCALES.SETTINGS"
+          :aria-label="LOCALES.SETTINGS"
         >
           <el-icon color="white">
             <Setting />
@@ -42,7 +45,8 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
         <router-link
           class="app-header__link"
           :to="{ name: RouteNames.History }"
-          aria-label="История списаний"
+          :title="LOCALES.HISTORY"
+          :aria-label="LOCALES.HISTORY"
         >
           <el-icon color="white">
             <Clock />
@@ -50,28 +54,30 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
         </router-link>
       </template>
     </div>
-    <div class="app-header__main">
+    <div class="app-header__brand" aria-hidden="true">
       <YTLogo class="app-header__logo" />
-      <el-text class="app-header__text"> YouTrack Time Tracker </el-text>
+      <el-text class="app-header__text">YouTrack Time Tracker</el-text>
     </div>
   </header>
 </template>
 
 <style lang="scss" scoped>
 .app-header {
+  position: relative;
   padding: 8px 12px;
   background-color: #5720c9;
   border-radius: 12px 12px 0 0;
   display: flex;
   height: 46px;
   align-items: center;
-  justify-content: space-between;
 
   :deep(.el-icon) {
     font-size: 22px;
   }
 
   &__nav {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -89,12 +95,16 @@ const showMainNav = computed(() => route.name === RouteNames.TrackTasks);
     }
   }
 
-  &__main {
+  &__brand {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 1;
-    justify-content: center;
+    pointer-events: none;
+    user-select: none;
   }
 
   &__logo {

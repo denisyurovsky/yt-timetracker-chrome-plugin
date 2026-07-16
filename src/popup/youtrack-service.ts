@@ -39,6 +39,7 @@ async function send<R>(message: WorkerMessage): Promise<R> {
 async function request<T>(
   method: YtRequestMethod,
   params?: Record<string, unknown>,
+  options?: { silentInvalidToken?: boolean },
 ): Promise<Either<KyError, T>> {
   let result: SerializedEither<T>;
 
@@ -53,7 +54,7 @@ async function request<T>(
     });
   }
 
-  if (!result.ok && result.invalidToken) {
+  if (!result.ok && result.invalidToken && !options?.silentInvalidToken) {
     handleInvalidToken();
   }
 
@@ -61,8 +62,8 @@ async function request<T>(
 }
 
 export default class YTService {
-  static getUserInfo() {
-    return request<YTMe>("getUserInfo");
+  static getUserInfo(options?: { silentInvalidToken?: boolean }) {
+    return request<YTMe>("getUserInfo", undefined, options);
   }
 
   static getProjects() {
@@ -76,8 +77,8 @@ export default class YTService {
     );
   }
 
-  static getTasks(query: string) {
-    return request<YTRegularTask[]>("getTasks", { query });
+  static getTasks(query: string, top = 20) {
+    return request<YTRegularTask[]>("getTasks", { query, top });
   }
 
   static getIssueById(issueId: string) {

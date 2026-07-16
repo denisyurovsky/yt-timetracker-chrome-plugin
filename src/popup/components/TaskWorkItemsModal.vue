@@ -82,6 +82,7 @@ async function remove(item: YTWorkItem) {
     :show-close="false"
     :title="task?.idReadable ?? ''"
     class="worklog-modal"
+    transition="modal-fade"
     @open="onOpen"
   >
     <template #header>
@@ -116,7 +117,7 @@ async function remove(item: YTWorkItem) {
             link
             type="danger"
             :loading="deletingId === item.id"
-            :title="LOCALES.DELETE"
+            :title="LOCALES.DELETE_WORKITEM"
             @click="remove(item)"
           >
             <el-icon><Delete /></el-icon>

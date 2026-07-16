@@ -145,6 +145,7 @@ onMounted(async () => {
               type="primary"
               underline="never"
               :href="issueUrl(row.task.idReadable)"
+              :title="LOCALES.OPEN_TASK_IN_YT"
               target="_blank"
               rel="noopener"
             >
@@ -153,7 +154,7 @@ onMounted(async () => {
             <el-text
               class="track-tasks-page__summary"
               type="info"
-              :title="row.task.summary"
+              :title="LOCALES.SHOW_TASK_HISTORY"
               @click="openWorklog(row)"
             >
               {{ row.task.summary }}
@@ -168,14 +169,25 @@ onMounted(async () => {
                 {{ formatMinutes(row.minutes) }}
               </template>
             </el-text>
-            <el-button type="primary" circle :icon="Plus" @click="openTimeModal(row)" />
+            <el-button
+              type="primary"
+              circle
+              :icon="Plus"
+              :title="LOCALES.TRACK_TIME"
+              :aria-label="LOCALES.TRACK_TIME"
+              @click="openTimeModal(row)"
+            />
           </div>
         </div>
       </template>
     </template>
 
     <el-empty v-if="!hasTasks" :description="LOCALES.NO_TASKS_HINT">
-      <el-button type="primary" @click="goToSettings">
+      <el-button
+        type="primary"
+        :title="LOCALES.GO_TO_SETTINGS"
+        @click="goToSettings"
+      >
         {{ LOCALES.GO_TO_SETTINGS }}
       </el-button>
     </el-empty>

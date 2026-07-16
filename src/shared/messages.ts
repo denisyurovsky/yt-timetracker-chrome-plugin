@@ -7,6 +7,9 @@
 /** Маркер невалидного токена — общий для воркера (генерирует) и popup (реагирует). */
 export const INVALID_TOKEN = "Невалидный токен";
 
+/** Инстанс YouTrack недоступен (сеть, таймаут, отказ соединения). */
+export const SERVER_UNAVAILABLE = "Сервер недоступен";
+
 export type YtRequestMethod =
   | "getUserInfo"
   | "getProjects"
@@ -24,6 +27,8 @@ export interface GetProjectsWorkTypesParams {
 
 export interface GetTasksParams {
   query: string;
+  /** Максимум задач в ответе ($top). По умолчанию 20. */
+  top?: number;
 }
 
 export interface GetIssueByIdParams {

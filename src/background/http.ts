@@ -12,19 +12,37 @@ import { getChromeStorage, setChromeStorage } from "@/storage/chrome-storage";
  */
 
 async function resolveBaseUrl(): Promise<string> {
+  const stored = await getChromeStorage<string>({
+    storageArea: "sync",
+    key: KEYS.YTURL,
+  });
+
+  if (typeof stored === "string" && stored) {
+    return stored;
+  }
+
   if (import.meta.env.DEV) {
     return import.meta.env.VITE_YT_URL;
   }
 
-  return getChromeStorage<string>({ storageArea: "sync", key: KEYS.YTURL });
+  return stored;
 }
 
 async function resolveToken(): Promise<string> {
+  const stored = await getChromeStorage<string>({
+    storageArea: "local",
+    key: KEYS.YTTOKEN,
+  });
+
+  if (typeof stored === "string" && stored) {
+    return stored;
+  }
+
   if (import.meta.env.DEV) {
     return import.meta.env.VITE_DEV_YT_TOKEN;
   }
 
-  return getChromeStorage<string>({ storageArea: "local", key: KEYS.YTTOKEN });
+  return stored;
 }
 
 export async function getKyInstance() {
@@ -39,7 +57,7 @@ export async function getKyInstance() {
       ],
       afterResponse: [
         async ({ response }) => {
-          if (response.status === 401 && !import.meta.env.DEV) {
+          if (response.status === 401) {
             await setChromeStorage({
               storageArea: "local",
               key: KEYS.YTTOKEN,

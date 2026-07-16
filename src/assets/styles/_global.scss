@@ -58,3 +58,15 @@ body {
   display: flex;
   align-items: center;
 }
+
+// Вместо стандартного dialog-fade (сдвиг сверху) — только opacity, как у смены экранов.
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  animation: none !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
