@@ -1,7 +1,7 @@
 {
   "name": "YouTrack TimeTracker",
   "description": "Convenient TimeTracker app integrated with YouTrack",
-  "version": "1.0",
+  "version": "1.0.0",
   "manifest_version": 3,
   "icons": {
     "16": "icons/icon16x16.png",

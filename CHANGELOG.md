@@ -1,9 +1,31 @@
 # Changelog
 
-Заметные изменения проекта. Раздел ниже описывает локальные коммиты, ещё не
-отправленные в `origin/master`.
+Все заметные изменения этого проекта документируются в этом файле.
+
+Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.1.0/),
+версионирование — [Semantic Versioning](https://semver.org/lang/ru/)
+(`MAJOR.MINOR.PATCH`).
+
+Правила для релизной нумерации:
+
+- **MAJOR** — несовместимые изменения (контракт API, storage, права манифеста).
+- **MINOR** — новая функциональность с обратной совместимостью.
+- **PATCH** — исправления и мелкие правки без новых фич.
+
+Как вести журнал:
+
+1. В ходе разработки пиши изменения в раздел `[Unreleased]`.
+2. При выпуске релиза перенеси содержимое `[Unreleased]` в новую секцию
+   `[X.Y.Z] - YYYY-MM-DD`, синхронизируй `version` в `package.json` и
+   `public/manifest.json`, очисти `[Unreleased]`.
+
+Текущий релиз в разработке: **1.0.0** (первый релиз расширения).
 
 ## [Unreleased]
+
+## [1.0.0] - Unreleased
+
+Первый релиз расширения YouTrack Time Tracker.
 
 ### Добавлено
 
@@ -54,9 +76,14 @@
   Element Plus задан как `large`.
 - `manifest.json`: добавлены host-разрешения для `localhost` и тестового
   инстанса `youtrack-test.sovcombank.ru`.
+- Бренд в шапке (`app-header__brand`) выровнен по центру независимо от кнопок
+  навигации слева.
 
 ### Исправлено
 
 - Парсер длительности отклонял валидные значения вроде `30м` и `30000м`
   из‑за сброса `lastIndex` у sticky-регулярки.
 - Мелкие правки стилей и обновление зависимостей (`package-lock.json`).
+
+[Unreleased]: https://github.com/denisyurovsky/yt-timetracker-chrome-plugin/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/denisyurovsky/yt-timetracker-chrome-plugin/releases/tag/v1.0.0
