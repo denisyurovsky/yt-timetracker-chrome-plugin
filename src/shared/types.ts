@@ -28,7 +28,6 @@ export interface YTWorkItemRef {
   name: string;
 }
 
-/** Запись о списанном времени за день. */
 export interface YTWorkItem {
   id: string;
   duration: { minutes: number };
@@ -36,6 +35,8 @@ export interface YTWorkItem {
   type: YTWorkItemRef | null;
   author?: { id: string };
   text?: string | null;
+  /** Задача списания — приходит только из глобального /api/workItems. */
+  issue?: { id: string; idReadable: string; summary: string };
   $type?: string;
 }
 
@@ -43,7 +44,6 @@ export interface YTTimeTracking {
   workItems: YTWorkItem[];
 }
 
-/** Настройки списания, сохраняемые между сессиями. */
 export interface YTSettings {
   /** ID проекта по умолчанию (sync). */
   projectId: string;

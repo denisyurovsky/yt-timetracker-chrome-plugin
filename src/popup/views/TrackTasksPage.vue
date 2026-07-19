@@ -14,7 +14,6 @@ import { RouteNames } from "@/popup/router";
 
 interface TrackRow {
   task: YTRegularTask;
-  /** Всё списанное на задачу время (все люди, все типы), в минутах. */
   minutes: number;
   loading: boolean;
 }
@@ -25,16 +24,13 @@ const regularRows = ref<TrackRow[]>([]);
 const dailyRows = ref<TrackRow[]>([]);
 const baseUrl = ref("");
 
-// Настройки, нужные модалке списания.
 const projectId = ref("");
 const defaultTypeId = ref("");
 const step = ref(DEFAULT_STEP);
 
-// Модалка списания.
 const isModalOpen = ref(false);
 const activeRow = ref<TrackRow | null>(null);
 
-// Модалка со списаниями пользователя по задаче.
 const isWorklogOpen = ref(false);
 const userId = ref("");
 
@@ -84,7 +80,6 @@ function openTimeModal(row: TrackRow) {
   isModalOpen.value = true;
 }
 
-// Обновляем суммарное время по задаче после изменения списаний.
 function reloadActiveRow() {
   if (activeRow.value) {
     loadMinutes(activeRow.value);
@@ -150,6 +145,7 @@ onMounted(async () => {
               type="primary"
               underline="never"
               :href="issueUrl(row.task.idReadable)"
+              :title="LOCALES.OPEN_TASK_IN_YT"
               target="_blank"
               rel="noopener"
             >
@@ -158,7 +154,7 @@ onMounted(async () => {
             <el-text
               class="track-tasks-page__summary"
               type="info"
-              :title="row.task.summary"
+              :title="LOCALES.SHOW_TASK_HISTORY"
               @click="openWorklog(row)"
             >
               {{ row.task.summary }}
@@ -173,14 +169,25 @@ onMounted(async () => {
                 {{ formatMinutes(row.minutes) }}
               </template>
             </el-text>
-            <el-button type="primary" circle :icon="Plus" @click="openTimeModal(row)" />
+            <el-button
+              type="primary"
+              circle
+              :icon="Plus"
+              :title="LOCALES.TRACK_TIME"
+              :aria-label="LOCALES.TRACK_TIME"
+              @click="openTimeModal(row)"
+            />
           </div>
         </div>
       </template>
     </template>
 
     <el-empty v-if="!hasTasks" :description="LOCALES.NO_TASKS_HINT">
-      <el-button type="primary" @click="goToSettings">
+      <el-button
+        type="primary"
+        :title="LOCALES.GO_TO_SETTINGS"
+        @click="goToSettings"
+      >
         {{ LOCALES.GO_TO_SETTINGS }}
       </el-button>
     </el-empty>
@@ -212,42 +219,64 @@ onMounted(async () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding-top: 6px;
+  gap: 8px;
+  padding: 4px 2px 12px;
+  overflow-y: auto;
 
-  &__section-title {
-    font-weight: 600;
-    margin: 8px 0 4px;
+  :deep(.el-empty) {
+    margin: auto;
   }
 
   &__row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 4px 0;
-    border-bottom: 1px solid;
+    gap: 10px;
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: var(--el-border-radius-base);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 2px 10px rgba(87, 32, 201, 0.1);
+    }
   }
 
   &__info {
     display: flex;
-    align-items: baseline;
-    gap: 6px;
+    align-items: center;
+    gap: 10px;
     flex: 1;
     min-width: 0;
   }
 
   &__id {
     flex-shrink: 0;
-    font-weight: 500;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--el-border-radius-small);
+    background-color: var(--el-color-primary-light-9);
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--el-color-primary-light-8);
+    }
   }
 
   &__summary {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: var(--el-text-color-regular);
     cursor: pointer;
+    transition: color 0.15s ease;
 
     &:hover {
+      color: var(--el-color-primary);
       text-decoration: underline;
     }
   }
@@ -255,12 +284,14 @@ onMounted(async () => {
   &__right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-shrink: 0;
   }
 
   &__time {
     white-space: nowrap;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
   }
 }
 </style>

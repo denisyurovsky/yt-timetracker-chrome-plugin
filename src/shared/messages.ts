@@ -7,6 +7,9 @@
 /** Маркер невалидного токена — общий для воркера (генерирует) и popup (реагирует). */
 export const INVALID_TOKEN = "Невалидный токен";
 
+/** Инстанс YouTrack недоступен (сеть, таймаут, отказ соединения). */
+export const SERVER_UNAVAILABLE = "Сервер недоступен";
+
 export type YtRequestMethod =
   | "getUserInfo"
   | "getProjects"
@@ -14,6 +17,7 @@ export type YtRequestMethod =
   | "getTasks"
   | "getIssueById"
   | "getTimeTracking"
+  | "getAllWorkItems"
   | "addWorkItem"
   | "deleteWorkItem";
 
@@ -23,6 +27,8 @@ export interface GetProjectsWorkTypesParams {
 
 export interface GetTasksParams {
   query: string;
+  /** Максимум задач в ответе ($top). По умолчанию 20. */
+  top?: number;
 }
 
 export interface GetIssueByIdParams {
@@ -33,6 +39,13 @@ export interface GetTimeTrackingParams {
   issueId: string;
   from: number;
   to: number;
+}
+
+export interface GetAllWorkItemsParams {
+  /** Автор списаний: id/login/ringId или "me" для текущего пользователя. */
+  author?: string;
+  /** Максимальное число возвращаемых записей ($top). */
+  top?: number;
 }
 
 export interface AddWorkItemParams {
@@ -51,7 +64,6 @@ export interface DeleteWorkItemParams {
 export interface YtApiMessage {
   kind: "yt-api";
   method: YtRequestMethod;
-  /** Параметры метода (projectId, issueId, тело списания и т.д.). */
   params?: Record<string, unknown>;
 }
 

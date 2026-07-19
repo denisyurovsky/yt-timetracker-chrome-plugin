@@ -10,9 +10,7 @@ import { computed, ref } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
-  /** ID текущего пользователя — по нему фильтруем списания. */
   userId: string;
 }>();
 
@@ -26,7 +24,6 @@ const workItems = ref<YTWorkItem[]>([]);
 const isLoading = ref(false);
 const deletingId = ref<string | null>(null);
 
-// Только моё суммарное время по задаче (сумма отображаемых списаний).
 const myTotalMinutes = computed(() =>
   workItems.value.reduce(
     (acc, item) => acc + (item.duration?.minutes ?? 0),
@@ -51,7 +48,6 @@ async function onOpen() {
     return;
   }
 
-  // Только списания текущего пользователя, новые сверху.
   workItems.value = res.value.workItems
     .filter((item) => item.author?.id === props.userId)
     .sort((a, b) => b.date - a.date);
@@ -86,6 +82,7 @@ async function remove(item: YTWorkItem) {
     :show-close="false"
     :title="task?.idReadable ?? ''"
     class="worklog-modal"
+    transition="modal-fade"
     @open="onOpen"
   >
     <template #header>
@@ -120,7 +117,7 @@ async function remove(item: YTWorkItem) {
             link
             type="danger"
             :loading="deletingId === item.id"
-            :title="LOCALES.DELETE"
+            :title="LOCALES.DELETE_WORKITEM"
             @click="remove(item)"
           >
             <el-icon><Delete /></el-icon>
@@ -140,31 +137,68 @@ async function remove(item: YTWorkItem) {
 .worklog-modal {
   &__body {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 2px;
     overflow-y: auto;
+
+    :deep(.el-empty) {
+      margin: auto;
+    }
   }
 
   &__row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--el-border-color-lighter);
+    gap: 10px;
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: var(--el-border-radius-base);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      box-shadow: 0 2px 10px rgba(87, 32, 201, 0.1);
+    }
   }
 
   &__info {
     display: flex;
-    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
   }
 
   &__date {
-    font-weight: 500;
+    flex-shrink: 0;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--el-border-radius-small);
+    background-color: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+  }
+
+  &__type {
+    flex-shrink: 0;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-text-color-secondary);
   }
 
   &__comment {
-    font-size: 12px;
+    flex-basis: 100%;
+    font-size: 13px;
     white-space: normal;
     word-break: break-word;
+    color: var(--el-text-color-secondary);
   }
 
   &__right {
@@ -176,6 +210,8 @@ async function remove(item: YTWorkItem) {
 
   &__time {
     white-space: nowrap;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
   }
 }
 </style>
@@ -191,5 +227,6 @@ async function remove(item: YTWorkItem) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  background-color: #fafafa;
 }
 </style>

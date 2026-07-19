@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { formatMinutes } from "@/popup/format";
+import { LOCALES } from "@/popup/locales";
 import type { YTRegularTask } from "@/shared/types";
 import { Close } from "@element-plus/icons-vue";
 import { computed } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Всё затреканное время по задаче, в минутах. */
   totalMinutes: number;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
 }>();
 
@@ -34,6 +33,7 @@ const issueUrl = computed(() => {
         class="task-modal-header__id"
         underline="never"
         :href="issueUrl"
+        :title="LOCALES.OPEN_TASK_IN_YT"
         target="_blank"
         rel="noopener"
       >
@@ -47,7 +47,8 @@ const issueUrl = computed(() => {
     <button
       class="task-modal-header__close"
       type="button"
-      aria-label="Закрыть"
+      :aria-label="LOCALES.CLOSE"
+      :title="LOCALES.CLOSE"
       @click="emit('close')"
     >
       <el-icon><Close /></el-icon>
@@ -57,22 +58,25 @@ const issueUrl = computed(() => {
 
 <style scoped lang="scss">
 .task-modal-header {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
   width: 100%;
+  // Симметричные отступы под кнопку закрытия — центрируемый текст не наезжает на неё.
+  padding: 0 30px;
   color: #fff;
+  font-size: 15px;
 
   &__total {
     white-space: nowrap;
     font-weight: 600;
-    // Время — слева, всё остальное прижато вправо.
-    margin-right: auto;
   }
 
   &__task {
     display: flex;
-    align-items: flex-end;
+    align-items: baseline;
     gap: 8px;
     min-width: 0;
   }
@@ -81,10 +85,16 @@ const issueUrl = computed(() => {
     --el-link-text-color: #fff;
     --el-link-hover-text-color: #fff;
     font-weight: 500;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
   }
 
   &__summary {
-    max-width: 180px;
+    max-width: 220px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -92,6 +102,10 @@ const issueUrl = computed(() => {
   }
 
   &__close {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -100,6 +114,15 @@ const issueUrl = computed(() => {
     background: none;
     color: #fff;
     cursor: pointer;
+    transition: opacity 0.15s ease;
+
+    &:hover {
+      opacity: 0.7;
+    }
+
+    .el-icon {
+      font-size: 24px;
+    }
   }
 }
 </style>

@@ -6,4 +6,11 @@
   --el-color-primary-light-8: #e7d4fb;
   --el-color-primary-light-9: #f4e9fe;
   --el-color-primary-dark-2: #4a1a9f;
+
+  // Element Plus берёт радиусы кнопок, инпутов, селектов, тегов, дропдаунов
+  // и т.п. из этих переменных.
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
+
+  --el-font-size-base: 15px;
 }

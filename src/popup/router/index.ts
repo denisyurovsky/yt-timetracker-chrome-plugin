@@ -1,12 +1,14 @@
 import LoginPage from "@/popup/views/LoginPage.vue";
 import SettingsPage from "@/popup/views/SettingsPage.vue";
 import TrackTasksPage from "@/popup/views/TrackTasksPage.vue";
+import HistoryPage from "@/popup/views/HistoryPage.vue";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 export enum RouteNames {
   Login = "login",
   Settings = "settings",
   TrackTasks = "track-tasks",
+  History = "history",
 }
 
 const router = createRouter({
@@ -26,6 +28,11 @@ const router = createRouter({
       name: RouteNames.TrackTasks,
       path: "/",
       component: TrackTasksPage,
+    },
+    {
+      name: RouteNames.History,
+      path: "/history",
+      component: HistoryPage,
     },
   ],
 });

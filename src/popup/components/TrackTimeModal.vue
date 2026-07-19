@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import YTService from "@/popup/youtrack-service";
 import { LOCALES } from "@/popup/locales";
-import { formatDuration, parseDuration } from "@/popup/format";
+import { formatDuration, parseDuration, tryParseDuration } from "@/popup/format";
 import TaskModalHeader from "@/popup/components/TaskModalHeader.vue";
 import type { YTRegularTask, YTWorkItemType } from "@/shared/types";
 import { notify } from "@/popup/notify";
@@ -9,15 +9,10 @@ import { computed, ref } from "vue";
 
 const props = defineProps<{
   task: YTRegularTask | null;
-  /** Всё затреканное время по задаче (для шапки), в минутах. */
   totalMinutes: number;
-  /** Базовый URL YouTrack для ссылки на задачу. */
   baseUrl: string;
-  /** Проект, чьи типы работ подтягиваем в дропдаун. */
   projectId: string;
-  /** Тип списания по умолчанию (из настроек). */
   defaultTypeId: string;
-  /** Длительность одного списания в минутах (шаг из настроек). */
   step: number;
 }>();
 
@@ -34,7 +29,6 @@ const comment = ref("");
 const isTypesLoading = ref(false);
 const isSaving = ref(false);
 
-// Пресеты времени списания: 15/30/45/60 + шаг из настроек (без дублей).
 const presets = computed(() => {
   const values = new Set<number>([props.step, 15, 30, 45, 60, 120, 180, 240, 360, 480]);
   return [...values].sort((a, b) => a - b);
@@ -85,6 +79,15 @@ async function save() {
     });
   }
 
+  const parsedDuration = tryParseDuration(durationText.value);
+  if (!parsedDuration.ok || parsedDuration.minutes < 1) {
+    return notify({
+      type: "error",
+      title: LOCALES.DEFAULT_ERROR,
+      message: LOCALES.INVALID_DURATION,
+    });
+  }
+
   const now = new Date();
   // Полдень локального дня: при конвертации в UTC дата не «съедет» на день назад.
   const date = new Date(
@@ -97,7 +100,7 @@ async function save() {
   isSaving.value = true;
   const res = await YTService.addWorkItem(
     props.task.id,
-    Math.max(1, parseDuration(durationText.value) || props.step),
+    parsedDuration.minutes,
     date,
     selectedTypeId.value,
     comment.value.trim() || undefined,
@@ -132,6 +135,7 @@ async function save() {
     :show-close="false"
     :title="task?.idReadable ?? ''"
     class="track-modal"
+    transition="modal-fade"
     @open="onOpen"
   >
     <template #header>
@@ -150,6 +154,7 @@ async function save() {
           :key="preset"
           size="small"
           :type="parseDuration(durationText) === preset ? 'primary' : ''"
+          :title="`${LOCALES.SET_DURATION}: ${formatDuration(preset)}`"
           @click="setDuration(preset)"
         >
           {{ formatDuration(preset) }}
@@ -160,12 +165,14 @@ async function save() {
         v-model="durationText"
         class="track-modal__minutes"
         :placeholder="LOCALES.DURATION_PLACEHOLDER"
+        :title="LOCALES.ENTER_DURATION"
       />
 
       <el-select
         v-model="selectedTypeId"
         class="track-modal__type"
         :loading="isTypesLoading"
+        :title="LOCALES.SELECT_WORK_TYPE_FOR_ENTRY"
       >
         <el-option
           v-for="type in workTypes"
@@ -181,12 +188,14 @@ async function save() {
         type="textarea"
         resize="none"
         :placeholder="LOCALES.COMMENT_PLACEHOLDER"
+        :title="LOCALES.ENTER_COMMENT"
       />
 
       <el-button
         class="track-modal__save"
         type="primary"
         :loading="isSaving"
+        :title="LOCALES.SAVE"
         @click="save"
       >
         {{ LOCALES.SAVE }}
@@ -200,14 +209,17 @@ async function save() {
   &__presets {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
+
+    :deep(.el-button) {
+      --el-button-size: 30px;
+    }
 
     :deep(.el-button + .el-button) {
       margin-left: 0;
     }
   }
 
-  // Тело — на всю высоту диалога; комментарий растягивается на остаток.
   &__body {
     display: flex;
     flex-direction: column;

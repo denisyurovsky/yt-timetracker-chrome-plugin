@@ -22,7 +22,7 @@ onMounted(async () => {
   <div class="app-container">
     <YTHeader />
     <router-view v-slot="{ Component }">
-      <Transition v-if="isInit" name="slide-right" mode="out-in">
+      <Transition v-if="isInit" name="fade" mode="out-in">
         <component :is="Component" class="layout" />
       </Transition>
     </router-view>
@@ -41,18 +41,13 @@ onMounted(async () => {
   overflow-y: auto;
 }
 
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.3s ease-out;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
 }
 
-.slide-right-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-
-.slide-right-leave-to {
-  transform: translateX(-100%);
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

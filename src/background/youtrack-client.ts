@@ -17,6 +17,7 @@ import type {
   GetTasksParams,
   GetIssueByIdParams,
   GetTimeTrackingParams,
+  GetAllWorkItemsParams,
   AddWorkItemParams,
   DeleteWorkItemParams,
 } from "@/shared/messages";
@@ -71,13 +72,20 @@ async function getProjectsWorkTypes(
 
 async function getTasks(
   query: string,
+  top = 20,
 ): Promise<Either<KyError, YTRegularTask[]>> {
   try {
     const ky = await getKyInstance();
+    const params = new URLSearchParams({
+      fields: "id,idReadable,summary",
+      $top: String(top),
+    });
+    if (query) {
+      params.set("query", query);
+    }
+
     const res = await ky
-      .get<
-        YTRegularTask[]
-      >(`/api/issues?fields=id,idReadable,summary&query=${encodeURIComponent(query)}`)
+      .get<YTRegularTask[]>(`/api/issues?${params.toString()}`)
       .json();
 
     return right(res);
@@ -119,6 +127,24 @@ async function getTimeTracking(
     return right(res);
   } catch (error) {
     return left(mapError(error, "Не удалось получить списания за день"));
+  }
+}
+
+async function getAllWorkItems(
+  author = "me",
+  top = 200,
+): Promise<Either<KyError, YTWorkItem[]>> {
+  try {
+    const ky = await getKyInstance();
+    const res = await ky
+      .get<YTWorkItem[]>(
+        `/api/workItems?fields=id,duration(minutes),date,type(id,name),author(id),text,issue(id,idReadable,summary)&author=${encodeURIComponent(author)}&$top=${top}`,
+      )
+      .json();
+
+    return right(res);
+  } catch (error) {
+    return left(mapError(error, "Не удалось получить историю списаний"));
   }
 }
 
@@ -183,7 +209,7 @@ export async function callYtApi(
     }
     case "getTasks": {
       const p = params as unknown as GetTasksParams;
-      return serializeEither(await getTasks(p.query));
+      return serializeEither(await getTasks(p.query, p.top));
     }
     case "getIssueById": {
       const p = params as unknown as GetIssueByIdParams;
@@ -192,6 +218,10 @@ export async function callYtApi(
     case "getTimeTracking": {
       const p = params as unknown as GetTimeTrackingParams;
       return serializeEither(await getTimeTracking(p.issueId, p.from, p.to));
+    }
+    case "getAllWorkItems": {
+      const p = (params ?? {}) as unknown as GetAllWorkItemsParams;
+      return serializeEither(await getAllWorkItems(p.author, p.top));
     }
     case "addWorkItem": {
       const p = params as unknown as AddWorkItemParams;

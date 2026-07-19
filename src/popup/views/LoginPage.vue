@@ -1,51 +1,77 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { notify } from "@/popup/notify";
 import YTService from "@/popup/youtrack-service";
 import { useRouter } from "vue-router";
 import { RouteNames } from "@/popup/router";
 import { LOCALES } from "@/popup/locales";
+import { YT_INSTANCES } from "@/popup/instances";
 
 const router = useRouter();
 
 const ytToken = ref("");
-const ytUrl = ref("http://localhost:55000");
+const ytUrl = ref<string>(YT_INSTANCES[0]);
+const isChecking = ref(false);
+const hasFailed = ref(false);
 
-async function proceed() {
-  if (!import.meta.env.DEV) {
-    // Токен и URL уходят в service worker — он их сохраняет и использует.
-    // Сам токен в popup не хранится.
+async function verifyToken() {
+  if (isChecking.value || isProceedDisabled.value) return;
+
+  isChecking.value = true;
+
+  try {
+    // Токен и URL уходят в service worker (в DEV — в localStorage) перед проверкой:
+    // getUserInfo читает их из хранилища и ходит в /api/users/me.
     await YTService.saveCredentials(ytToken.value, ytUrl.value);
 
-    const res = await YTService.getUserInfo();
+    const res = await YTService.getUserInfo({ silentInvalidToken: true });
 
     if (res.isLeft()) {
+      hasFailed.value = true;
       return notify({
         title: LOCALES.DEFAULT_ERROR,
         type: "error",
         message: res.value.message,
       });
     }
-  }
 
-  router.push({ name: RouteNames.Settings });
+    hasFailed.value = false;
+    router.push({ name: RouteNames.Settings });
+  } finally {
+    isChecking.value = false;
+  }
 }
 
 const isProceedDisabled = computed(
-  () => !ytToken.value.length || !ytUrl.value.length,
+  () => !ytToken.value.length || !ytUrl.value.length || isChecking.value,
 );
+
+const buttonLabel = computed(() =>
+  hasFailed.value ? LOCALES.RETRY_TOKEN_CHECK : LOCALES.VERIFY_TOKEN,
+);
+
+watch([ytToken, ytUrl], () => {
+  hasFailed.value = false;
+});
 </script>
 
 <template>
   <div class="login-page">
     <div class="login-page__inputs">
-      <el-input
-        clearable
+      <el-select
         class="my-m"
         placeholder="URL YouTrack"
         v-model="ytUrl"
+        :disabled="isChecking"
+        :title="LOCALES.SELECT_YT_URL"
       >
-      </el-input>
+        <el-option
+          v-for="instance in YT_INSTANCES"
+          :key="instance"
+          :label="instance"
+          :value="instance"
+        />
+      </el-select>
       <el-input
         type="password"
         class="my-s"
@@ -54,7 +80,9 @@ const isProceedDisabled = computed(
         size="large"
         autofocus
         placeholder="Ввести токен YouTrack"
-        @keydown.enter="proceed"
+        :disabled="isChecking"
+        :title="LOCALES.ENTER_TOKEN"
+        @keydown.enter="verifyToken"
       />
       <el-text size="small">
         {{ LOCALES.HOW_TO_RETRIEVE_TOKEN }}
@@ -64,9 +92,11 @@ const isProceedDisabled = computed(
       class="login-page__proceed"
       type="primary"
       :disabled="isProceedDisabled"
-      @click="proceed"
+      :loading="isChecking"
+      :title="buttonLabel"
+      @click="verifyToken"
     >
-      {{ LOCALES.CONNECT }}
+      {{ buttonLabel }}
     </el-button>
   </div>
 </template>
