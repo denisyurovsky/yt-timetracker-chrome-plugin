@@ -62,7 +62,14 @@ onMounted(async () => {
   baseUrl.value = await loadYouTrackUrl();
 
   isLoading.value = true;
-  const res = await YTService.getAllWorkItems();
+  // История — только последние два дня (сегодня + вчера).
+  const now = new Date();
+  const start = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - 1,
+  ).getTime();
+  const res = await YTService.getAllWorkItems("me", 200, start);
   isLoading.value = false;
 
   if (res.isLeft()) {

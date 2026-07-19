@@ -46,6 +46,8 @@ export interface GetAllWorkItemsParams {
   author?: string;
   /** Максимальное число возвращаемых записей ($top). */
   top?: number;
+  /** Нижняя граница даты списания (unix мс). */
+  start?: number;
 }
 
 export interface AddWorkItemParams {

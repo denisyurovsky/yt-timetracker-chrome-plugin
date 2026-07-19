@@ -133,12 +133,14 @@ async function getTimeTracking(
 async function getAllWorkItems(
   author = "me",
   top = 200,
+  start?: number,
 ): Promise<Either<KyError, YTWorkItem[]>> {
   try {
     const ky = await getKyInstance();
+    const startParam = start ? `&start=${start}` : "";
     const res = await ky
       .get<YTWorkItem[]>(
-        `/api/workItems?fields=id,duration(minutes),date,type(id,name),author(id),text,issue(id,idReadable,summary)&author=${encodeURIComponent(author)}&$top=${top}`,
+        `/api/workItems?fields=id,duration(minutes),date,type(id,name),author(id),text,issue(id,idReadable,summary)&author=${encodeURIComponent(author)}&$top=${top}${startParam}`,
       )
       .json();
 
@@ -221,7 +223,7 @@ export async function callYtApi(
     }
     case "getAllWorkItems": {
       const p = (params ?? {}) as unknown as GetAllWorkItemsParams;
-      return serializeEither(await getAllWorkItems(p.author, p.top));
+      return serializeEither(await getAllWorkItems(p.author, p.top, p.start));
     }
     case "addWorkItem": {
       const p = params as unknown as AddWorkItemParams;
